@@ -1,13 +1,18 @@
 # PATHFINDER project, built for the Something Beautiful Hackathon
 ## Team: 
 * [Lucy Moglia](https://eigenlucy.github.io): PCB Design, Firmware Design, Atopile Integration
-* Veronica Chambers: Backend Design, LLM Integration, LLM Persistence and Memory System
-* Casey Manning: Interface UI/UX Design, Animation Design,
+* [Veronica Chambers](https://www.linkedin.com/in/victoria-cabrera-moglia/): Backend Design, LLM Integration, LLM Persistence and Memory System
+* [Casey Manning](https://caseymanning.github.io/): Interface UI/UX Design, Animation Design,
 * [Jessie Stiles](https://jessiestiles.github.io/portfolio1.github.io/): Enclosure CAD Design, 
 
-# References: 
+# References/Dependencies:
 * [OpenRouteService](https://openrouteservice.org/)
 * [OpenRouteService Route Visualization Guide](https://medium.com/@atulvpoddar4/visualizing-routes-with-real-data-a-python-guide-to-interactive-mapping-db14189cf185)
+* [Izzymonitor Project Page](https://eigenlucy.github.io/projects/izzymonitor/) and [Repo with pin refs](https://github.com/eigenlucy/ESPHome-Panel/tree/izzymonitor/)
+* [Izzymonitor actions run associated with PCB on hand](https://github.com/eigenlucy/ESPHome-Panel/actions/runs/13046416119). Build artifacts in Actions run contain Gerbers+PCBA files.
+
+# Open Questions:
+* Do we want to use python, rust, or cpp for esp32s3. We have some [Rust firmware working](https://github.com/izzyhub/izzymonitor-firmware) to a limited degree. Micropython is a solid option too, and might make OTAA updates easier.
 
 # TO DO
 ## PCB/Basic Firmware: 
