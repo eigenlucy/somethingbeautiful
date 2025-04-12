@@ -5,6 +5,13 @@
 * [Casey Manning](https://caseymanning.github.io/): Interface UI/UX Design, Animation Design,
 * [Jessie Stiles](https://jessiestiles.github.io/portfolio1.github.io/): Enclosure CAD Design, 
 
+## High level overview:
+Route and activity planning bot that lives in a panel beside your door. Tell it where you want to go, how much of a rush you're in, what kind of activities you are looking for wtc, and it will troll through a variety of databases to plan your route. Much is left to the personality of the agent associated with the individual user. 
+
+## Notes:
+* Using commit df3bad4 for PCB
+* We should all settle on some example prompts, eg "I'd like to spend two hours getting lunch by the pier"
+
 # References/Dependencies:
 * [OpenRouteService](https://openrouteservice.org/)
 * [OpenRouteService Route Visualization Guide](https://medium.com/@atulvpoddar4/visualizing-routes-with-real-data-a-python-guide-to-interactive-mapping-db14189cf185)
@@ -13,6 +20,7 @@
 
 # Open Questions:
 * Do we want to use python, rust, or cpp for esp32s3. We have some [Rust firmware working](https://github.com/izzyhub/izzymonitor-firmware) to a limited degree. Micropython is a solid option too, and might make OTAA updates easier.
+* How much of a pain is it going to be to give agents this much freedom to troll through databases while actually being interesting?
 
 # TO DO
 ## PCB/Basic Firmware: 
