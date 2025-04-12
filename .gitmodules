@@ -1,0 +1,3 @@
+[submodule "ESPHome-Panel"]
+	path = ESPHome-Panel
+	url = https://github.com/eigenlucy/ESPHome-Panel.git

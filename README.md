@@ -5,20 +5,22 @@
 * Casey Manning: Interface UI/UX Design, Animation Design,
 * [Jessie Stiles](https://jessiestiles.github.io/portfolio1.github.io/): Enclosure CAD Design, 
 
+# References: 
+* [OpenRouteService](https://openrouteservice.org/)
+* [OpenRouteService Route Visualization Guide](https://medium.com/@atulvpoddar4/visualizing-routes-with-real-data-a-python-guide-to-interactive-mapping-db14189cf185)
+
 # TO DO
-## PCB: 
+## PCB/Basic Firmware: 
 - 1: Get Ato build working. Building with V3 compiler, or linked to old repo with working build files at least for a fallback.
 - 2: Board recording, display working, speaking/amplifier working, playing audio files, buttons/leds working,
-	- display needs to have Personality. Cute animations with the TFT LCD, a cute text interface + animated waveform, cut UX, expressiveness with the keyboard LEDs, should feel alive and spunky
-- 3: Board plugs into backend, send audio to be processed into text, text processed by LLM, replies sent back and played over the microphone with animaitons
-- 4: There should be a cute 3D printable enclosure to mount to a wall, should match the aesthestics and personality we settle on
-- 5: board should be orderable by terminal with a json
+- 3: board should be able to be ordered via terminal with a json config with address and payment info
 - NOTES:
 ## ENCLOSURE: 
 - 1: Design a cute enclosure to mount the board on a wall by a door with holes to mount buttons (ideally also 3D printable) which show off the backlighting. Should have holes for the microphone and speakers too, plus USB ports and all. Give it lots of personality.
 - NOTES:
-## TRICKY FIRMWARE STUFF:
+## FIRMWARE:
 - Animations for the tiny LCD, could really use cases help with this
+- display needs to have Personality. Cute animations with the TFT LCD, a cute text interface + animated waveform, cut UX, expressiveness with the keyboard LEDs, should feel alive and spunky
 - Pulling video and audio and text files from the web server backend and syncing everything, could really use casey's help with this
 - Cute button based UI to select the user, mode (straightforward pathfinding, wander mode, HAOS mode) selection, settings like brightness and speaker volume, and activation, could really use casey's guidance on making the interfaces cute
 - NOTES:
