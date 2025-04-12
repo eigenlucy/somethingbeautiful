@@ -58,6 +58,7 @@ See [atopile docs](https://docs.atopile.io/atopile/introduction) for detailed gu
 ## Building the project
 ### 1: Clone the required submodules
 ```$ git submodule update --init --recursive```
+- You actually wanna make sure you are using the specific commit hash we built this around for the ESPHome-Panel
 ### 2: Build the project to select components based on JLCPCB availability and load them into the kicad PCB
 ``` $ ato build -t all```
 ### 3: Complete/review the layout with Kicad Standalone PCB editor
