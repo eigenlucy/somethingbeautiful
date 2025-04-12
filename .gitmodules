@@ -1,3 +1,6 @@
 [submodule "ESPHome-Panel"]
 	path = ESPHome-Panel
 	url = https://github.com/eigenlucy/ESPHome-Panel.git
+[submodule "RustFirmware/izzymonitor-firmware"]
+	path = RustFirmware/izzymonitor-firmware
+	url = https://github.com/izzyhub/izzymonitor-firmware
