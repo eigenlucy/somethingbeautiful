@@ -2,8 +2,9 @@
 ## Team: 
 * [Lucy Moglia](https://eigenlucy.github.io): PCB Design, Firmware Design, Atopile Integration
 * [Veronica Chambers](https://www.linkedin.com/in/victoria-cabrera-moglia/): Backend Design, LLM Integration, LLM Persistence and Memory System
-* [Casey Manning](https://caseymanning.github.io/): Interface UI/UX Design, Animation Design,
-* [Jessie Stiles](https://jessiestiles.github.io/portfolio1.github.io/): Enclosure CAD Design, 
+* [Casey Manning](https://caseymanning.github.io/): Interface UI/UX Design, Animation Design
+* [Jessie Stiles](https://jessiestiles.github.io/portfolio1.github.io/): Enclosure CAD Design,
+* [Yoyo](https://exanova-y.github.io): 
 
 ## High level overview:
 Route and activity planning bot that lives in a panel beside your door. Tell it where you want to go, how much of a rush you're in, what kind of activities you are looking for wtc, and it will troll through a variety of databases to plan your route. Much is left to the personality of the agent associated with the individual user. 
