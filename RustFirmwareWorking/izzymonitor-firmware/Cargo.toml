@@ -23,7 +23,7 @@ esp-backtrace = { version = "0.15.0", features = [
   "panic-handler",
   "println",
 ] }
-esp-hal = { version = "0.23.1", features = ["esp32s3", "unstable"] }
+esp-hal = { version = "0.23.1", features = ["esp32s3"] }
 esp-println = { version = "0.13.0", features = ["esp32s3", "log"] }
 esp-wifi = { version = "0.12.0", default-features = false, features = [
   "ble",
@@ -60,8 +60,15 @@ esp-hal-embassy = { version = "0.6.0", features = ["esp32s3"] }
 static_cell = { version = "2.1.0", features = ["nightly"] }
 smart-leds = "0.4.0"
 ws2812-spi = "0.5.0"
-#esp-hal-smartled = { git = "https://github.com/esp-rs/esp-hal-community" }
-esp-hal-smartled = { git = "https://github.com/esp-rs/esp-hal-community/" }
+ws2812-esp32-rmt-driver = "0.12.0"
+# search = "1.1.0"  # Removing this as it has no lib target
+st7735-lcd = "0.10.0"
+embedded-graphics = "0.8.1"
+
+# We're using esp-hal which doesn't need esp-idf-sys
+
+[features]
+default = []
 
 [profile.dev]
 # Rust debug is too slow.
@@ -76,3 +83,5 @@ incremental = false
 lto = 'fat'
 opt-level = 's'
 overflow-checks = false
+
+# No longer using esp-idf-sys

@@ -4,11 +4,21 @@
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
 use esp_backtrace as _;
-use esp_hal::{rmt::Rmt, time::RateExtU32};
 use esp_hal::clock::CpuClock;
 use esp_hal::gpio::{Pull, Level, Input, Output};
+use esp_hal::spi::{Spi, SpiMode};
+use esp_hal::prelude::*;
 use log::{debug, info, error};
-use esp_hal_smartled::{smartLedBuffer, SmartLedsAdapter};
+use ws2812_esp32_rmt_driver::driver::color::LedPixelColorGrb24;
+use ws2812_esp32_rmt_driver::{LedPixelEsp32Rmt, RGB8_BRIGHTNESS_CHANNEL_FACTOR};
+use st7735_lcd::{ST7735, Orientation};
+use embedded_graphics::{
+    mono_font::{ascii::FONT_6X10, MonoTextStyleBuilder},
+    pixelcolor::Rgb565,
+    prelude::*,
+    primitives::{Rectangle, PrimitiveStyle},
+    text::{Baseline, Text},
+};
 use smart_leds::{
     brightness, gamma,
     hsv::{hsv2rgb, Hsv},
@@ -76,7 +86,7 @@ async fn watch_key6(key_pin: Input<'static>, key_name: &'static str) {
 }
 
 #[esp_hal_embassy::main]
-async fn main(spawner: Spawner) {
+async fn main(spawner: Spawner) -> Result<(), esp_hal::rmt::Error> {
     // generator version: 0.2.2
 
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
@@ -103,20 +113,68 @@ async fn main(spawner: Spawner) {
 
     let mut backlight = Output::new(peripherals.GPIO46, Level::Low);
     backlight.set_high();
+    
+    // Initialize the ST7735 display
+    info!("Initializing ST7735 display");
+    
+    // Define the pins for the ST7735 display
+    let sck = peripherals.GPIO36;
+    let mosi = peripherals.GPIO37;
+    let cs = peripherals.GPIO38;
+    let dc = Output::new(peripherals.GPIO39, Level::Low);
+    let rst = Output::new(peripherals.GPIO40, Level::Low);
+    
+    // Configure SPI for the display
+    let spi = Spi::new_txonly(
+        peripherals.SPI2,
+        sck,
+        mosi,
+        cs,
+        27u32.MHz(),
+        SpiMode::Mode0,
+        &esp_hal::clock::CpuClock::get()
+    );
+    
+    // Initialize the ST7735 driver
+    let mut display = ST7735::new(spi, dc, rst, true, false, 160, 128);
+    
+    // Initialize the display
+    display.init(&mut |delay_ms| {
+        Timer::after(Duration::from_millis(delay_ms as u64)).await;
+    }).unwrap();
+    display.set_orientation(&Orientation::Landscape).unwrap();
+    display.clear(Rgb565::BLACK.into()).unwrap();
+    
+    // Draw a welcome message
+    let text_style = MonoTextStyleBuilder::new()
+        .font(&FONT_6X10)
+        .text_color(Rgb565::GREEN)
+        .build();
+    
+    let border_style = PrimitiveStyle::with_stroke(Rgb565::YELLOW, 1);
+    
+    // Draw a border around the display
+    Rectangle::new(Point::new(0, 0), Size::new(160, 128))
+        .into_styled(border_style)
+        .draw(&mut display)
+        .unwrap();
+    
+    // Draw welcome text
+    Text::with_baseline("IzzyMonitor Ready!", Point::new(20, 20), text_style, Baseline::Top)
+        .draw(&mut display)
+        .unwrap();
+    
+    info!("ST7735 display initialized");
+    
     // Initialize the Delay peripheral, and use it to toggle the LED state in a
     // loop.
     //
 
     let led_pin = peripherals.GPIO16;
-    let freq = 80.MHz();
-    let rmt = Rmt::new(peripherals.RMT, freq).unwrap();
-
-    info!("creating buffer??");
+    info!("creating LED driver");
     const LED_COUNT: usize = 6;
-    let rmt_buffer = smartLedBuffer!(6);
-    info!("created buffer??");
-    let mut led = SmartLedsAdapter::new(rmt.channel0, led_pin, rmt_buffer);
-    info!("created adapter");
+    let mut led = LedPixelEsp32Rmt::<RGB8, LedPixelColorGrb24, _>::new(0, led_pin)?;
+    info!("created LED driver");
     let mut color = Hsv {
         hue: 0,
         sat: 255,
@@ -176,6 +234,8 @@ async fn main(spawner: Spawner) {
         Err(error) => error!("Error spawning task: {error}"),
     }
 
+    // This loop will run indefinitely, so we'll never actually reach the end of the function
+    // But we need to satisfy the compiler with a return type
     loop {
         //info!("looping");
         for hue in 0..=255 {
@@ -202,8 +262,11 @@ async fn main(spawner: Spawner) {
             //info!("wrote to led");
             Timer::after(Duration::from_millis(20)).await;
         }
-
     }
+    
+    // This is unreachable but needed for the compiler
+    #[allow(unreachable_code)]
+    Ok(())
 
     // for inspiration have a look at the examples at https://github.com/esp-rs/esp-hal/tree/v0.23.1/examples/src/bin
 }

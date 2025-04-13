@@ -13,3 +13,7 @@ target = "xtensa-esp32s3-none-elf"
 
 [unstable]
 build-std = ["alloc", "core"]
+
+# This helps esp-idf-sys find the correct target
+# These profile target settings are not supported in config.toml
+# Moving to Cargo.toml
