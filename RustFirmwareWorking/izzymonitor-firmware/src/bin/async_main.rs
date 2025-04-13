@@ -1,8 +1,6 @@
 #![no_std]
 #![no_main]
 
-use alloc::boxed::Box;
-use alloc::vec;
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
 use esp_backtrace as _;
@@ -17,18 +15,19 @@ use smart_leds::{
     SmartLedsWrite,
     RGB8,
 };
-use ws2812_spi::Ws2812;
 
 extern crate alloc;
 
+/*
 #[embassy_executor::task]
-async fn blink_backlight(mut backlight_pin: Output<'static>) {
+ async fn blink_backlight(mut backlight_pin: Output<'static>) {
     loop {
         Timer::after(Duration::from_secs(1)).await;
         info!("Hello world!");
         backlight_pin.toggle();
     }
 }
+*/
 
 async fn key_watcher(mut key_pin: Input<'static>, key_name: &'static str) {
     loop {
@@ -47,32 +46,32 @@ async fn key_watcher(mut key_pin: Input<'static>, key_name: &'static str) {
 }
 
 #[embassy_executor::task]
-async fn watch_key(mut key_pin: Input<'static>, key_name: &'static str) {
+async fn watch_key(key_pin: Input<'static>, key_name: &'static str) {
     key_watcher(key_pin, key_name).await
 }
 
 #[embassy_executor::task]
-async fn watch_key2(mut key_pin: Input<'static>, key_name: &'static str) {
+async fn watch_key2(key_pin: Input<'static>, key_name: &'static str) {
     key_watcher(key_pin, key_name).await
 }
 
 #[embassy_executor::task]
-async fn watch_key3(mut key_pin: Input<'static>, key_name: &'static str) {
+async fn watch_key3(key_pin: Input<'static>, key_name: &'static str) {
     key_watcher(key_pin, key_name).await
 }
 
 #[embassy_executor::task]
-async fn watch_key4(mut key_pin: Input<'static>, key_name: &'static str) {
+async fn watch_key4(key_pin: Input<'static>, key_name: &'static str) {
     key_watcher(key_pin, key_name).await
 }
 
 #[embassy_executor::task]
-async fn watch_key5(mut key_pin: Input<'static>, key_name: &'static str) {
+async fn watch_key5(key_pin: Input<'static>, key_name: &'static str) {
     key_watcher(key_pin, key_name).await
 }
 
 #[embassy_executor::task]
-async fn watch_key6(mut key_pin: Input<'static>, key_name: &'static str) {
+async fn watch_key6(key_pin: Input<'static>, key_name: &'static str) {
     key_watcher(key_pin, key_name).await
 }
 
@@ -126,12 +125,14 @@ async fn main(spawner: Spawner) {
 
     let mut data: [RGB8; LED_COUNT] = [(0, 0, 0).into(); LED_COUNT];
 
+    /*
     //let _ = spawner;
     let res = spawner.spawn(blink_backlight(backlight));
     match res {
         Ok(_) => info!("spawned backlight blinker"),
         Err(error) => error!("Error spawning task: {error}"),
     }
+    */
 
     let key1 = Input::new(peripherals.GPIO14, Pull::Up);
     let res = spawner.spawn(watch_key(key1, "key 1"));
