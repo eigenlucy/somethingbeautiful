@@ -1,13 +1,14 @@
-// Place this file at src/bin/display.rs
+// src/bin/display.rs
 #![no_std]
 
+extern crate alloc;
+
 use alloc::string::String;
-use alloc::format;
 use core::fmt::Write;
 use embedded_graphics::{
     mono_font::{
-        ascii::{FONT_6X10, FONT_8X13, FONT_9X18_BOLD},
-        MonoFont, MonoTextStyle,
+        ascii::{FONT_6X10, FONT_8X13},
+        MonoTextStyle,
     },
     pixelcolor::Rgb565,
     prelude::*,
@@ -17,8 +18,7 @@ use embedded_graphics::{
 use display_interface_spi::SPIInterfaceNoCS;
 use st7735_lcd::{ST7735, Orientation};
 use esp_hal::{
-    gpio::{AnyOutputPin, Output, Level},
-    spi::master::{Spi, Instance},
+    gpio::{Output, Level},
     clock::Clocks,
     prelude::*,
 };
@@ -36,13 +36,13 @@ pub const COLOR_BUTTON_ACTIVE: Rgb565 = Rgb565::new(20, 40, 20); // Brighter gre
 pub const COLOR_BORDER: Rgb565 = Rgb565::new(15, 30, 15);      // Medium green
 pub const COLOR_HIGHLIGHT: Rgb565 = Rgb565::new(31, 50, 20);   // Yellowish green
 
-// Display driver type
-pub type Display<SPI> = ST7735
+// Display driver type - fixed to work with your SPI2 instance
+pub type Display = ST7735
     SPIInterfaceNoCS
-        SPI,
-        Output<'static>,
+        esp_hal::spi::master::Spi<'static, esp_hal::peripherals::SPI2>,
+        Output<'static>
     >,
-    Output<'static>,
+    Output<'static>
 >;
 
 // Zone definitions for different screen areas
@@ -70,15 +70,11 @@ pub struct UIState {
 }
 
 // Initialize display and configure it
-pub fn init_display<SPI>(
-    spi: SPI,
+pub fn init_display(
+    spi: esp_hal::spi::master::Spi<'static, esp_hal::peripherals::SPI2>,
     dc: Output<'static>,
     mut rst: Output<'static>,
-    clocks: &Clocks,
-) -> Result<Display<SPI>, &'static str> 
-where 
-    SPI: embedded_hal::blocking::spi::Write<u8>
-{
+) -> Result<Display, &'static str> {
     // Create SPI interface
     let spii = SPIInterfaceNoCS::new(spi, dc);
     
@@ -106,7 +102,7 @@ where
     Ok(display)
 }
 
-// Define our standard text zones based on your mockups
+// Define our standard text zones
 pub fn get_default_zones() -> [TextZone; 5] {
     [
         // Header zone - top of screen
@@ -158,8 +154,8 @@ pub fn get_default_zones() -> [TextZone; 5] {
 }
 
 // Draw a text zone with border
-pub fn draw_zone<SPI: embedded_hal::blocking::spi::Write<u8>>(
-    display: &mut Display<SPI>, 
+pub fn draw_zone(
+    display: &mut Display, 
     zone: &TextZone
 ) -> Result<(), core::convert::Infallible> {
     if zone.border {
@@ -179,8 +175,8 @@ pub fn draw_zone<SPI: embedded_hal::blocking::spi::Write<u8>>(
 }
 
 // Draw text in a zone
-pub fn draw_text_in_zone<SPI: embedded_hal::blocking::spi::Write<u8>>(
-    display: &mut Display<SPI>,
+pub fn draw_text_in_zone(
+    display: &mut Display,
     zone: &TextZone,
     text: &str,
     highlight: bool,
@@ -218,52 +214,6 @@ pub fn draw_text_in_zone<SPI: embedded_hal::blocking::spi::Write<u8>>(
     Ok(())
 }
 
-// Draw a waveform pattern to visualize audio
-pub fn draw_audio_waveform<SPI: embedded_hal::blocking::spi::Write<u8>>(
-    display: &mut Display<SPI>,
-    zone: &TextZone,
-    active: bool,
-) -> Result<(), core::convert::Infallible> {
-    // Clear zone first
-    draw_zone(display, zone)?;
-    
-    // If not active, just draw a flat line
-    if !active {
-        let line = Line::new(
-            Point::new(zone.x + 5, zone.y + (zone.height as i32 / 2)),
-            Point::new(zone.x + zone.width as i32 - 5, zone.y + (zone.height as i32 / 2)),
-        )
-        .into_styled(PrimitiveStyle::with_stroke(COLOR_TEXT, 1));
-        
-        line.draw(display)?;
-        return Ok(());
-    }
-    
-    // Draw a simple sine wave-like pattern for active audio
-    let wave_height = (zone.height as i32 / 4) as i32;
-    let center_y = zone.y + (zone.height as i32 / 2);
-    let step = 4;
-    
-    for i in 0..((zone.width - 10) / step) {
-        let x1 = zone.x + 5 + (i * step) as i32;
-        let x2 = zone.x + 5 + ((i + 1) * step) as i32;
-        
-        // Calculate random-ish y positions for jagged audio pattern
-        let y1 = center_y + ((i as i32 % 7) - 3) * wave_height / 3;
-        let y2 = center_y + (((i + 1) as i32 % 7) - 3) * wave_height / 3;
-        
-        let line = Line::new(
-            Point::new(x1, y1),
-            Point::new(x2, y2),
-        )
-        .into_styled(PrimitiveStyle::with_stroke(COLOR_TEXT, 1));
-        
-        line.draw(display)?;
-    }
-    
-    Ok(())
-}
-
 // Initialize UI state
 pub fn init_ui_state() -> UIState {
     let mut user_name = String::new();
@@ -278,8 +228,8 @@ pub fn init_ui_state() -> UIState {
 }
 
 // Draw the main menu screen
-pub fn draw_main_screen<SPI: embedded_hal::blocking::spi::Write<u8>>(
-    display: &mut Display<SPI>, 
+pub fn draw_main_screen(
+    display: &mut Display, 
     state: &UIState
 ) -> Result<(), core::convert::Infallible> {
     // Clear the screen
@@ -308,8 +258,8 @@ pub fn draw_main_screen<SPI: embedded_hal::blocking::spi::Write<u8>>(
 }
 
 // Draw the trip menu screen
-pub fn draw_trip_screen<SPI: embedded_hal::blocking::spi::Write<u8>>(
-    display: &mut Display<SPI>,
+pub fn draw_trip_screen(
+    display: &mut Display,
     state: &UIState
 ) -> Result<(), core::convert::Infallible> {
     // Clear the screen
@@ -332,8 +282,8 @@ pub fn draw_trip_screen<SPI: embedded_hal::blocking::spi::Write<u8>>(
 }
 
 // Draw the settings menu screen
-pub fn draw_settings_screen<SPI: embedded_hal::blocking::spi::Write<u8>>(
-    display: &mut Display<SPI>,
+pub fn draw_settings_screen(
+    display: &mut Display,
     state: &UIState
 ) -> Result<(), core::convert::Infallible> {
     // Clear the screen
@@ -352,117 +302,6 @@ pub fn draw_settings_screen<SPI: embedded_hal::blocking::spi::Write<u8>>(
     draw_text_in_zone(display, &zones[2], "Back", state.active_button == 0)?;
     draw_text_in_zone(display, &zones[3], "Edit", state.active_button == 1)?;
     draw_text_in_zone(display, &zones[4], "Save", state.active_button == 2)?;
-    
-    Ok(())
-}
-
-// Draw the listening/speaking mode screen
-pub fn draw_speaking_mode<SPI: embedded_hal::blocking::spi::Write<u8>>(
-    display: &mut Display<SPI>,
-    listening: bool
-) -> Result<(), core::convert::Infallible> {
-    // Clear the screen
-    display.clear(COLOR_BACKGROUND)?;
-    
-    let zones = get_default_zones();
-    
-    // Draw header
-    draw_text_in_zone(
-        display, 
-        &zones[0], 
-        if listening { "Listening..." } else { "Processing..." }, 
-        false
-    )?;
-    
-    // Draw waveform in content area
-    draw_audio_waveform(display, &zones[1], listening)?;
-    
-    // Draw buttons - only cancel is active in listening mode
-    draw_text_in_zone(display, &zones[2], "Cancel", true)?;
-    draw_text_in_zone(display, &zones[3], "", false)?;
-    draw_text_in_zone(display, &zones[4], "", false)?;
-    
-    Ok(())
-}
-
-// Draw the navigation screen with route
-pub fn draw_navigation_screen<SPI: embedded_hal::blocking::spi::Write<u8>>(
-    display: &mut Display<SPI>, 
-    from: &str,
-    to: &str
-) -> Result<(), core::convert::Infallible> {
-    // Clear the screen
-    display.clear(COLOR_BACKGROUND)?;
-    
-    let zones = get_default_zones();
-    
-    // Draw header with route info
-    let mut header = String::new();
-    write!(header, "{} -> {}", from, to).unwrap();
-    draw_text_in_zone(display, &zones[0], &header, false)?;
-    
-    // Draw route visualization in content area
-    draw_zone(display, &zones[1])?;
-    
-    // Draw route points
-    let point_a = Point::new(zones[1].x + 20, zones[1].y + zones[1].height as i32 - 15);
-    let point_b = Point::new(zones[1].x + zones[1].width as i32 - 20, zones[1].y + 15);
-    
-    // Point A
-    let circle_a = RoundedRectangle::new(
-        Rectangle::new(
-            Point::new(point_a.x - 3, point_a.y - 3),
-            Size::new(6, 6),
-        ),
-        Size::new(3, 3),
-    )
-    .into_styled(PrimitiveStyle::with_fill(COLOR_TEXT));
-    
-    circle_a.draw(display)?;
-    
-    // Point B
-    let circle_b = RoundedRectangle::new(
-        Rectangle::new(
-            Point::new(point_b.x - 3, point_b.y - 3),
-            Size::new(6, 6),
-        ),
-        Size::new(3, 3),
-    )
-    .into_styled(PrimitiveStyle::with_fill(COLOR_TEXT));
-    
-    circle_b.draw(display)?;
-    
-    // Draw route line (dotted)
-    let dx = (point_b.x - point_a.x) / 10;
-    let dy = (point_b.y - point_a.y) / 10;
-    
-    for i in 0..9 {
-        if i % 2 == 0 {
-            let x1 = point_a.x + dx * i;
-            let y1 = point_a.y + dy * i;
-            let x2 = point_a.x + dx * (i + 1);
-            let y2 = point_a.y + dy * (i + 1);
-            
-            let line = Line::new(
-                Point::new(x1, y1),
-                Point::new(x2, y2),
-            )
-            .into_styled(PrimitiveStyle::with_stroke(COLOR_TEXT, 1));
-            
-            line.draw(display)?;
-        }
-    }
-    
-    // Draw labels
-    let text_style = MonoTextStyle::new(&FONT_6X10, COLOR_TEXT);
-    
-    Text::new("A", Point::new(point_a.x - 10, point_a.y), text_style).draw(display)?;
-    Text::new("B", Point::new(point_b.x + 6, point_b.y), text_style).draw(display)?;
-    
-    // Draw buttons
-    draw_text_in_zone(display, &zones[2], "Back", true)?;
-    draw_text_in_zone(display, &zones[3], "Details", false)?;
-    draw_text_in_zone(display, &zones[4], "Share", false)?;
     
     Ok(())
 }
