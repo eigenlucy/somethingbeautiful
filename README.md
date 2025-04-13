@@ -7,6 +7,8 @@
 * [Yoyo](https://exanova-y.github.io): 
 
 ## High level overview:
+ESP32-S3 microcontroller,  a MAX98357 I2S digital amplifier (esp-hal i2s audio library), a ST7735S based 128 * 160 pixel LCD (st7735-lcd crate), and  WS2812B Neopixels (smart_leds crate)
+
 Route and activity planning bot that lives in a panel beside your door. Tell it where you want to go, how much of a rush you're in, what kind of activities you are looking for wtc, and it will troll through a variety of databases to plan your route. Much is left to the personality of the agent associated with the individual user. 
 
 ## Notes:
