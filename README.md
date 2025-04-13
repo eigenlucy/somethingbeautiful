@@ -136,35 +136,35 @@ See [ATO_USAGE.md](ATO_USAGE.md) for detailed instructions on working with atopi
 ## Project Status and To-Do List
 
 ### PCB/Basic Firmware
-- [ ] PCB works
+- [x] PCB works
 - [x] Initial atopile setup
 - [x] Get Ato build working with V3 compiler
 - [ ] Board recording sound from PDM I2S microphone
 - [ ] ST7735 LCD display working over SPI
 - [ ] I2S amp/speaker working 
 - [x] Buttons/WS2812B LEDs working
-- [ ] Ordering system via terminal with address and payment config
 
 ### Enclosure
 - [x] Design 3D-printable wall-mountable enclosure with personality
 - [x] Accommodate all components (buttons, microphone, speakers, USB ports)
 
-### Firmware
+### Firmware/UI
+- [ ] UI/Menu design
 - [ ] LCD text based UI and voice animations
-- [ ] Web server integration to send audio and text back and forth
+- [ ] Web server integration to send and receive audio and text
 - [ ] Button-based UI for user selection, mode settings, and volume control
+- [ ] Route feedback convo mode
 
 ### LLM Integration
 - [ ] User recognition with personalized agents
-- [ ] Route planning integration (OpenRouteService)
+- [x] Route planning integration (OpenRouteService)
 - [ ] Voice synthesis and speech recognition
-- [ ] Agent personality development
+- [x] Agent personality development
 - [ ] Gradual Infilatration of Fixations to Pathfinding :3
-- [ ] Agent personality development
 
 ### Backend
 - [ ] Request processing from device
-- [ ] Speech-to-text integration
-- [ ] Media synchronization
-- [ ] Persistence and memory system for user preferences
-- [ ] Map / location lookup system
+- [x] Speech-to-text integration
+- [ ] Audio and text file sharing from web server
+- [x] Agent persistence and memory system for user preferences
+- [x] Map / location lookup system
